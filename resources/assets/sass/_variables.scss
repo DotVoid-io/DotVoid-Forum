@@ -20,6 +20,7 @@ $colors-core: (
 // Light theme
 
 $colors-light: map-merge($colors-core, (
+        background: #e6e6e6,
         titles: (#333333, #000000, #2f3640),
         text: #2f3640
 ));
@@ -27,7 +28,10 @@ $colors-light: map-merge($colors-core, (
 // Dark theme
 
 $colors-dark: map-merge($colors-core, (
-      // TODO: Dark theme colors
+        background: #2f3640,
+        header: #24272b,
+        text: #fbfbfb,
+        placeholder: #b9b9b9
 ));
 
 // Helpers
@@ -90,11 +94,11 @@ $colors-dark: map-merge($colors-core, (
 //         color: <something>;  // $colors-dark -> text (TODO: Fill)
 //     }
 @mixin themed($property, $key, $child: false) {
-  &.light {
+  .light & {
     #{$property}: get_color_light($key, $child);
   }
 
-  &.dark {
+  .dark & {
     #{$property}: get_color_dark($key, $child);
   }
 }
