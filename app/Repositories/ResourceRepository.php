@@ -197,6 +197,27 @@ abstract class ResourceRepository
     }
 
     /**
+     * Get a paginate of the deleted recordings matching the given WHERE clause.
+     *
+     * @param  string  $column
+     * @param  string $operator
+     * @param  mixed  $value
+     * @param  int  $n the amount of recordings per page
+     * @param  array|mixed  $columns the columns to select with optional alias, defaults to '*'
+     * @param  bool  $only, select only the deleted ones if true, select all existing records if set to false. Default to true.
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getPaginateWhereTrashed(string $column, string $operator, $value, int $n = ResourceRepository::AMOUNT_PER_PAGE, $columns = ['*'], bool $only = true)
+    {
+        $paginate = $this->model->where($column, $operator, $value)->select($columns);
+        $paginate = $only ?
+            $paginate->onlyTrashed():
+            $paginate->withTrashed();
+
+        return $paginate->paginate($n);
+    }
+
+    /**
      * Get a paginate of the recordings ordered according to the given column.
      *
      * @param  int  $n the amount of recordings per page
