@@ -32,10 +32,13 @@ install_dependencies()
 	apt-get -y autoremove
 
 	composer install
-	npm update
+
+	npm install --global laravel-echo-server
+
 	npm install
 	nodejs node_modules/node-sass/scripts/install.js
 	npm rebuild node-sass
+
 	npm run dev
 }
 
@@ -72,7 +75,7 @@ process_name=%(program_name)s_%(process_num)02d
 command=php /vagrant/artisan queue:work --sleep=3 --tries=3
 autostart=true
 autorestart=true
-user=vagrant
+user=www-data
 numprocs=1
 redirect_stderr=true
 stdout_logfile=/vagrant/storage/logs/worker.log
