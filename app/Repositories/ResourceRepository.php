@@ -98,7 +98,7 @@ abstract class ResourceRepository
      */
     public function getWhere(string $column, string $operator, $value, $columns = ['*'], int $limit = 100)
     {
-        $search = $operator == 'LIKE' ? '%'.$this->escape_like($value).'%' : $value;
+        $search = $operator == 'LIKE' ? '%'.$this->escapeLike($value).'%' : $value;
         return $this->model->select($columns)->where($column, $operator, $search)->take($limit)->get();
     }
 
@@ -115,7 +115,7 @@ abstract class ResourceRepository
      */
     public function getWhereTrashed(string $column, string $operator, $value, $columns = ['*'], int $limit = 100, bool $only = true)
     {
-        $search = $operator == 'LIKE' ? '%'.$this->escape_like($value).'%' : $value;
+        $search = $operator == 'LIKE' ? '%'.$this->escapeLike($value).'%' : $value;
         $query = $this->model->select($columns)->where($column, $operator, $search)->take($limit)->get();
         $query = $only ?
             $query->onlyTrashed():
@@ -346,7 +346,7 @@ abstract class ResourceRepository
      *
      * @return string
      */
-    private function escape_like(string $value, string $char = '\\')
+    protected function escapeLike(string $value, string $char = '\\')
     {
         return str_replace(
             [$char, '%', '_'],
