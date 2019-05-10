@@ -28,7 +28,7 @@ class CategoryController extends Controller
     {
         $this->categoryRepository = $categoryRepository;
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -72,7 +72,6 @@ class CategoryController extends Controller
      */
     public function update(CategoryUpdateRequest $request, Category $category)
     {
-        Log::info(filterEmpty($request));
         $this->categoryRepository->update($category, filterEmpty($request));
         return new Response('', Response::HTTP_NO_CONTENT);
     }
