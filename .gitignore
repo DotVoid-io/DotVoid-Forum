@@ -16,3 +16,6 @@ yarn-error.log
 .env
 /*.log*
 composer.phar
+.buildpath
+.project
+.settings/
