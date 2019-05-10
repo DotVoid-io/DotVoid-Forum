@@ -8,7 +8,7 @@ use App\Http\Requests\Category\CategoryUpdateRequest;
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use App\Repositories\ResourceRepository;
 
 class CategoryController extends Controller
 {
@@ -61,6 +61,17 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         return $category->load('subs');
+    }
+
+    /**
+     * Display the basic threads in the given category.
+     *
+     * @param  \App\Models\Category  $category
+     * @return \Illuminate\Http\Response
+     */
+    public function threads(Category $category)
+    {
+        return $category->basicThreads()->paginate(ResourceRepository::AMOUNT_PER_PAGE);
     }
 
     /**
