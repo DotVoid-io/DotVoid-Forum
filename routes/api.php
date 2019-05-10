@@ -22,3 +22,4 @@ Route::middleware('auth:api')->group(function () {
 
 // TODO put in "can" middleware
 Route::resource('categories', 'CategoryController', ['except' => ['create','edit']]);
+Route::get('categories/{category}/threads', 'CategoryController@threads')->name('categories.threads');
