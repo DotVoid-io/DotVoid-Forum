@@ -53,7 +53,7 @@ class CreateThreadsAndComments extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->softDeletes();
             $table->increments('id');
-            $table->unsignedInteger('parent_id');
+            $table->unsignedInteger('parent_id')->nullable();
             // self-reference cannot be created here because the table
             // doesn't exist yet, it will be created in the next block
             $table->string('name');

@@ -2,9 +2,8 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Repositories\ResourceRepository;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoryRepository extends ResourceRepository
 {
@@ -21,6 +20,26 @@ class CategoryRepository extends ResourceRepository
     }
 
     /**
+     * Get a list of all categories or sub-categories.
+     * @param int $parentId the id of the parent category, leave null for main
+     * categories.
+     * @param string $search search criteria in the "name" column, nullable
+     * @return array
+     */
+    public function get(int $parentId = null, string $search = null)
+    {
+        $query = $parentId != null ?
+            $this->model->where('parent_id', $parentId):
+            $this->model->whereNull('parent_id');
+
+        if($search != null) {
+            $query->where('name', 'LIKE', '%'.$this->escapeLike($search).'%');
+        }
+
+        return $query->get();
+    }
+
+    /**
      * Resource relative behavior for saving a record.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -29,7 +48,7 @@ class CategoryRepository extends ResourceRepository
      */
     protected function save(Model $model, Array $inputs)
     {
-        $model->parent_id = $inputs['parent_id'];
+        if(isset($inputs['parent_id'])) $model->parent_id = $inputs['parent_id'];
         $model->name = $inputs['name'];
         $model->description = $inputs['description'];
         $model->fa_icon = $inputs['fa_icon'];
