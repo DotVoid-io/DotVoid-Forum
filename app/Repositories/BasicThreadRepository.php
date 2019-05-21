@@ -2,9 +2,8 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Repositories\ResourceRepository;
 use App\Models\BasicThread;
+use Illuminate\Database\Eloquent\Model;
 
 class BasicThreadRepository extends ResourceRepository
 {
@@ -18,6 +17,24 @@ class BasicThreadRepository extends ResourceRepository
     public function __construct(BasicThread $model)
     {
         $this->model = $model;
+    }
+
+    /**
+     * Get an ordered list of all basic threads with thread relation.
+     * @param int $categoryId
+     * @param string $search
+     * @param array $columns
+     * @param int $n
+     */
+    public function get(int $categoryId, string $search = null, array $columns = ['*'], int $n = ResourceRepository::AMOUNT_PER_PAGE) {
+
+        $query = $this->model->with('thread');
+
+        if($search != null) {
+            $query->where('title', 'LIKE', '%'.$this->escapeLike($search).'%');
+        }
+
+        return $query->select($columns)->orderBy('updated_at', 'desc')->paginate($n);
     }
 
     /**
