@@ -17,6 +17,7 @@ Developing a forum ourselves allows to involve the community, energize it and br
 * Composer
 * Supervisor
 * Node.JS
+* xdebug
 * [VirtualBox](https://www.virtualbox.org/) and [Vagrant](https://www.vagrantup.com/) (Optional but recommended)
 
 **Recommended OS:** Ubuntu 18.04 LTS
@@ -65,7 +66,20 @@ Password: admin
 5. Open a terminal and `cd` to the project's root directory.
 6. Make sure the `www-data` user has write access to the `storage` and `bootstrap` directories.
 7. Copy `env.example` and change its content to match your local configuration.
-8. Run the following commands (replacing the path with your path):
+9. Create the following files:
+- /etc/supervisor/conf.d/laravel-worker.conf
+```
+[program:laravel-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /vagrant/artisan queue:work --sleep=3 --tries=3
+autostart=true
+autorestart=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/vagrant/storage/logs/worker.log
+```
+10. Run the following commands (replacing the path with your path):
 ```
 composer install
 npm install
@@ -88,7 +102,7 @@ line="* * * * * php /path/to/project/artisan schedule:run >> /dev/null 2>&1"
 
 ## Running the tests
 
-To run the automated tests, simply run : `php ./vendor/phpunit/phpunit/phpunit` when your current directory is the root of the project.
+To run the automated tests, simply run : `php ./vendor/phpunit/phpunit/phpunit` when your current directory is the root of the project. A code coverage report will be generated in the `report` folder.
 
 ## Contributing
 

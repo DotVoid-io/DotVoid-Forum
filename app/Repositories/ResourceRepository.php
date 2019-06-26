@@ -50,10 +50,9 @@ abstract class ResourceRepository
      */
     public function getAllTrashed(bool $only = true, $columns = ['*'])
     {
-        $query = $this->getAll($columns);
         return $only ?
-            $query->onlyTrashed()->get():
-            $query->withTrashed()->get();
+            $this->model->onlyTrashed()->select($columns)->get():
+            $this->model->withTrashed()->select($columns)->get();
     }
 
     /**
@@ -116,7 +115,7 @@ abstract class ResourceRepository
     public function getWhereTrashed(string $column, string $operator, $value, $columns = ['*'], int $limit = 100, bool $only = true)
     {
         $search = $operator == 'LIKE' ? '%'.$this->escapeLike($value).'%' : $value;
-        $query = $this->model->select($columns)->where($column, $operator, $search)->take($limit)->get();
+        $query = $this->model->select($columns)->where($column, $operator, $search)->take($limit);
         $query = $only ?
             $query->onlyTrashed():
             $query->withTrashed();
@@ -128,7 +127,7 @@ abstract class ResourceRepository
      * Get a single recording by its id.
      *
      * @param  int  $id
-     * @param  array|mixed  $columns the columns to select with optional alias, defaults to '*'
+     * @param  array  $columns the columns to select with optional alias, defaults to '*'
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function getById(int $id, $columns = ['*'])
@@ -140,7 +139,7 @@ abstract class ResourceRepository
      * Get a single deleted recording by its id.
      *
      * @param  int  $id
-     * @param  array|mixed  $columns the columns to select with optional alias, defaults to '*'
+     * @param  array  $columns the columns to select with optional alias, defaults to '*'
      * @param  bool  $only, select only the deleted ones if true, select all existing records if set to false. Default to true.
      * @return \Illuminate\Database\Eloquent\Model
      */
@@ -209,7 +208,8 @@ abstract class ResourceRepository
      */
     public function getPaginateWhereTrashed(string $column, string $operator, $value, int $n = ResourceRepository::AMOUNT_PER_PAGE, $columns = ['*'], bool $only = true)
     {
-        $paginate = $this->model->where($column, $operator, $value)->select($columns);
+        $search = $operator == 'LIKE' ? '%'.$this->escapeLike($value).'%' : $value;
+        $paginate = $this->model->where($column, $operator, $search)->select($columns);
         $paginate = $only ?
             $paginate->onlyTrashed():
             $paginate->withTrashed();
@@ -220,30 +220,30 @@ abstract class ResourceRepository
     /**
      * Get a paginate of the recordings ordered according to the given column.
      *
-     * @param  int  $n the amount of recordings per page
      * @param  string  $orderColumn
      * @param  string  $order (ex.: 'asc', 'desc')
+     * @param  int  $n the amount of recordings per page
      * @param  array|mixed  $columns the columns to select with optional alias, defaults to '*'
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getPaginateOrdered(int $n = ResourceRepository::AMOUNT_PER_PAGE, string $orderColumn, string $order, $columns = ['*'])
+    public function getPaginateOrdered(string $orderColumn, string $order, int $n = ResourceRepository::AMOUNT_PER_PAGE, $columns = ['*'])
     {
-        return $this->model->select($columns)->orderBy($orderColumn,$order)->paginate($n);
+        return $this->model->select($columns)->orderBy($orderColumn, $order)->paginate($n);
     }
 
     /**
      * Get a paginate of the deleted recordings ordered according to the given column.
      *
-     * @param  int  $n the amount of recordings per page
      * @param  string  $orderColumn
      * @param  string  $order (ex.: 'asc', 'desc')
+     * @param  int  $n the amount of recordings per page
      * @param  array|mixed  $columns the columns to select with optional alias, defaults to '*'
      * @param  bool  $only, select only the deleted ones if true, select all existing records if set to false. Default to true.
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getPaginateOrderedTrashed(int $n = ResourceRepository::AMOUNT_PER_PAGE, string $orderColumn, string $order, $columns = ['*'], bool $only = true)
+    public function getPaginateOrderedTrashed(string $orderColumn, string $order, int $n = ResourceRepository::AMOUNT_PER_PAGE, $columns = ['*'], bool $only = true)
     {
-        $paginate = $this->model->select($columns)->orderBy($orderColumn,$order);
+        $paginate = $this->model->select($columns)->orderBy($orderColumn, $order);
         $paginate = $only ?
             $paginate->onlyTrashed():
             $paginate->withTrashed();
@@ -337,6 +337,7 @@ abstract class ResourceRepository
         $record = $this->getById($id, [$this->model->getKeyName()]);
         $this->destroy($record, $force);
     }
+
     /**
      * Delete a record
      *
@@ -370,10 +371,10 @@ abstract class ResourceRepository
     protected function escapeLike(string $value, string $char = '\\')
     {
         return str_replace(
-            [$char, '%', '_'],
-            [$char.$char, $char.'%', $char.'_'],
-            $value
-        );
+                [$char, '%', '_'],
+                [$char.$char, $char.'%', $char.'_'],
+                $value
+            );
     }
 
 }
